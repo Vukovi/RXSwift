@@ -56,11 +56,50 @@ class PhotosViewController: UICollectionViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // ovo dodajem da bi svaki put pitao za dozvolu kad ulazim u fotografije
+        let authorized = PHPhotoLibrary.authorized.share()
+        
+        authorized
+            .skipWhile { $0 == false } // ako se ne dozvoli ulazak u Photos, preskace
+            .take(1) // ovim uzima samo prvi element iz observera, iako je to u ovom slucaju uvek true, ovim je naglasena namera da samo sa prvim true-om hocu da radim
+            .subscribe { [weak self] in
+                self?.photos = PhotosViewController.loadPhotos()
+                // zasto GCD, jer u PHPhotoLibrary+Rx, kad promenim status na "dozvoljen pristup"
+                // requestAuthorization({ (newStatus) in ... }) ovaj deo tog koda ne garantuje
+                // na kom threadu ce se njegov klozer izvrsiti, tako da ako nisam gurnuo collectionView?.reloadData()
+                // na main thread onda puca aplikacija
+                DispatchQueue.main.async {
+                    self?.collectionView?.reloadData()
+                }
+            }.disposed(by: bag)
+        
+        authorized
+            // ova tri filtera deluju prenatrpano, jer observer koji daej dozvolu za ulazak u fotografije
+            // ima sequencu od dva emitovanja, true i false, ne znamo kojim redom
+            // pa ako se preskoci prvi, a zatim uzme  jedan poslednji dogadjaj, a zatim proveri da li je on true
+            // sve deluje prenatrpano, li zbog mogucih promena u iOS, UIKit-u, ovim prenatrpanim kodom
+            // se postize preciznost onoga sto nam treba, tj da izbaci poruku kad nije dozvoljen pristup
+            .skip(1)
+            .takeLast(1)
+            .filter { $0 == false }
+            .subscribe { [weak self] in
+                guard let errorMessage = self?.errorMessage else { return }
+                DispatchQueue.main.async(execute: errorMessage)
+            }.disposed(by: bag)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         selectedPhotosSubject.onCompleted() // nije neophodno, ali pomaze sa automatskim disposal-om, jer govori svim observerima da je potpisivanje gotovo
+    }
+    
+    private func errorMessage() {
+        alert(title: "NIJE DOZVOLJEN PRISTUP FOTOGRAFIJAMA", text: "Dozvoli pristup iz Settings-a aplikacije")
+            .take(5.0, scheduler: MainScheduler.instance) // ovim ce alert postojati tokom 5 sekundi
+            .subscribe {
+                self.dismiss(animated: true, completion: nil)
+                _ = self.navigationController?.popViewController(animated: true)
+            }.disposed(by: bag)
     }
     
     // MARK: UICollectionView

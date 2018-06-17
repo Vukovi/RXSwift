@@ -18,6 +18,8 @@
 		9CE7E5E61DE5A40A00C8BA5A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9CE7E5E51DE5A40A00C8BA5A /* Assets.xcassets */; };
 		9CE7E5E91DE5A40A00C8BA5A /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9CE7E5E71DE5A40A00C8BA5A /* LaunchScreen.storyboard */; };
 		9CE7E5F11DE5A94600C8BA5A /* Podfile in Resources */ = {isa = PBXBuildFile; fileRef = 9CE7E5F01DE5A94600C8BA5A /* Podfile */; };
+		BFF040EF20D56CEF005ED4F0 /* Problem Visestrukog Subscriba IStog Observabla.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF040EE20D56CEF005ED4F0 /* Problem Visestrukog Subscriba IStog Observabla.swift */; };
+		BFF040F120D57EEB005ED4F0 /* PHPhotoLibrary+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF040F020D57EEB005ED4F0 /* PHPhotoLibrary+Rx.swift */; };
 		BFF9950720CD0B13000E9733 /* UIAlertViewController+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFF9950620CD0B13000E9733 /* UIAlertViewController+Rx.swift */; };
 /* End PBXBuildFile section */
 
@@ -36,6 +38,8 @@
 		9CE7E5E81DE5A40A00C8BA5A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		9CE7E5EA1DE5A40A00C8BA5A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9CE7E5F01DE5A94600C8BA5A /* Podfile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Podfile; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
+		BFF040EE20D56CEF005ED4F0 /* Problem Visestrukog Subscriba IStog Observabla.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Problem Visestrukog Subscriba IStog Observabla.swift"; sourceTree = "<group>"; };
+		BFF040F020D57EEB005ED4F0 /* PHPhotoLibrary+Rx.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PHPhotoLibrary+Rx.swift"; sourceTree = "<group>"; };
 		BFF9950620CD0B13000E9733 /* UIAlertViewController+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIAlertViewController+Rx.swift"; sourceTree = "<group>"; };
 		F16689A3021C695C310464A0 /* Pods-Combinestagram.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Combinestagram.release.xcconfig"; path = "Pods/Target Support Files/Pods-Combinestagram/Pods-Combinestagram.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,9 +79,12 @@
 		9CDD7B0A1DE6E38E0058B2D5 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
-				9CDD7B031DE5AABE0058B2D5 /* UIImage+Collage.swift */,
 				9CE7E5DC1DE5A40900C8BA5A /* AppDelegate.swift */,
 				9CDD7B0B1DE6E3D30058B2D5 /* PhotoWriter.swift */,
+				9CDD7B031DE5AABE0058B2D5 /* UIImage+Collage.swift */,
+				BFF9950620CD0B13000E9733 /* UIAlertViewController+Rx.swift */,
+				BFF040EE20D56CEF005ED4F0 /* Problem Visestrukog Subscriba IStog Observabla.swift */,
+				BFF040F020D57EEB005ED4F0 /* PHPhotoLibrary+Rx.swift */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -109,7 +116,6 @@
 				9CE7E5DE1DE5A40A00C8BA5A /* MainViewController.swift */,
 				9CDD7B051DE5BC660058B2D5 /* PhotosViewController.swift */,
 				9CDD7B071DE6D7ED0058B2D5 /* PhotoCell.swift */,
-				BFF9950620CD0B13000E9733 /* UIAlertViewController+Rx.swift */,
 			);
 			path = Combinestagram;
 			sourceTree = "<group>";
@@ -256,6 +262,8 @@
 				9CDD7B041DE5AABE0058B2D5 /* UIImage+Collage.swift in Sources */,
 				9CDD7B081DE6D7ED0058B2D5 /* PhotoCell.swift in Sources */,
 				9CDD7B061DE5BC660058B2D5 /* PhotosViewController.swift in Sources */,
+				BFF040EF20D56CEF005ED4F0 /* Problem Visestrukog Subscriba IStog Observabla.swift in Sources */,
+				BFF040F120D57EEB005ED4F0 /* PHPhotoLibrary+Rx.swift in Sources */,
 				9CDD7B0C1DE6E3D30058B2D5 /* PhotoWriter.swift in Sources */,
 				9CE7E5DF1DE5A40A00C8BA5A /* MainViewController.swift in Sources */,
 				BFF9950720CD0B13000E9733 /* UIAlertViewController+Rx.swift in Sources */,
