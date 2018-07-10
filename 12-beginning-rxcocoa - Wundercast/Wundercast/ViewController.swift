@@ -35,17 +35,17 @@ class ViewController: UIViewController {
         style()
         
         // Listener trenutnog vremena ApiControllera, setovan sa bzvz podacima
-        ApiController.shared.currentWeather(city: "RxCity")
-            .observeOn(MainScheduler.instance)
-            .subscribe { (data) in
-                if let element = data.element {
-                    self.tempLabel.text = "\(element.temperature) C"
-                    self.iconLabel.text = element.icon
-                    self.humidityLabel.text = "\(element.humidity)"
-                    self.cityNameLabel.text = element.cityName
-                }
-            }
-            .disposed(by: bag)
+//        ApiController.shared.currentWeather(city: "RxCity")
+//            .observeOn(MainScheduler.instance)
+//            .subscribe { (data) in
+//                if let element = data.element {
+//                    self.tempLabel.text = "\(element.temperature) C"
+//                    self.iconLabel.text = element.icon
+//                    self.humidityLabel.text = "\(element.humidity)"
+//                    self.cityNameLabel.text = element.cityName
+//                }
+//            }
+//            .disposed(by: bag)
         
         //MARK: - Part 1
         // Povezivanje text fielda sa ApiController-om
@@ -296,6 +296,22 @@ class ViewController: UIViewController {
         search.map { [$0.overlay()] }
             .drive(mapView.rx.overlays)
             .disposed(by: bag)
+        
+        
+        textSearch.asDriver(onErrorJustReturn: ApiController.Weather.dummy)
+            .map { $0.coordinate }
+            .drive(mapView.rx.location)
+            .disposed(by: bag)
+        
+        mapInput.flatMap { coordinate in
+            return ApiController.shared.currentWeatherAround(lat: coordinate.latitude, lon: coordinate.longitude)
+                .catchErrorJustReturn([])
+            }
+            .asDriver(onErrorJustReturn:[])
+            .map { $0.map { $0.overlay() } }
+            .drive(mapView.rx.overlays)
+            .disposed(by: bag)
+
     }
     
     override func viewDidAppear(_ animated: Bool) {
