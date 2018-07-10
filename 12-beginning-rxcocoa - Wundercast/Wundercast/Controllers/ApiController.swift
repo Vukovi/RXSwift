@@ -5,18 +5,18 @@ import SwiftyJSON
 import CoreLocation
 import MapKit
 
-class ApiController {
-
-  
-    struct Weather {
-        let cityName: String
-        let temperature: Int
-        let humidity: Int
-        let icon: String
-        let lat: Double
-        let lon: Double
+public class ApiController {
+    
+    
+    public struct Weather {
+        public let cityName: String
+        public let temperature: Int
+        public let humidity: Int
+        public let icon: String
+        public let lat: Double
+        public let lon: Double
         
-        static let empty = Weather(
+        public static let empty = Weather(
             cityName: "Unknown",
             temperature: -1000,
             humidity: 0,
@@ -25,7 +25,7 @@ class ApiController {
             lon: 0
         )
         
-        static let dummy = Weather(
+        public static let dummy = Weather(
             cityName: "RxCity",
             temperature: 20,
             humidity: 90,
@@ -34,11 +34,11 @@ class ApiController {
             lon: 0
         )
         
-        var coordinate: CLLocationCoordinate2D {
+        public var coordinate: CLLocationCoordinate2D {
             return CLLocationCoordinate2D(latitude: lat, longitude: lon)
         }
         
-        func overlay() -> Overlay {
+        public func overlay() -> Overlay {
             let coordinates: [CLLocationCoordinate2D] = [
                 CLLocationCoordinate2D(latitude: lat - 0.25, longitude: lon - 0.25),
                 CLLocationCoordinate2D(latitude: lat + 0.25, longitude: lon + 0.25)
@@ -50,8 +50,8 @@ class ApiController {
         }
         
         public class Overlay: NSObject, MKOverlay {
-            var coordinate: CLLocationCoordinate2D
-            var boundingMapRect: MKMapRect
+            public var coordinate: CLLocationCoordinate2D
+            public var boundingMapRect: MKMapRect
             let icon: String
             
             init(icon: String, coordinate: CLLocationCoordinate2D, boundingMapRect: MKMapRect) {
@@ -80,25 +80,32 @@ class ApiController {
             }
         }
     }
-
-  /// The shared instance
-  static var shared = ApiController()
-
-  /// The api key to communicate with openweathermap.org
-  /// Create you own on https://home.openweathermap.org/users/sign_up
-  private let apiKey = "a992851722a7f96842cb1cc185570065"
-
-  /// API base URL
-  let baseURL = URL(string: "http://api.openweathermap.org/data/2.5")!
-
-  init() {
-    Logging.URLRequests = { request in
-      return true
+    
+    /// The shared instance
+    static var shared = ApiController()
+    
+    /// The api key to communicate with openweathermap.org
+    /// Create you own on https://home.openweathermap.org/users/sign_up
+//    private let apiKey = "a992851722a7f96842cb1cc185570065"
+    let apiKey = BehaviorSubject(value: "a992851722a7f96842cb1cc185570065")
+    
+    /// API base URL
+    let baseURL = URL(string: "http://api.openweathermap.org/data/2.5")!
+    
+    init() {
+        Logging.URLRequests = { request in
+            return true
+        }
     }
-  }
-
-  //MARK: - Api Calls
-
+    
+    enum ApiError: Error {
+        case cityNotFound
+        case serverFailure
+        case invalidKey
+    }
+    
+    //MARK: - Api Calls
+    
     func currentWeather(city: String) -> Observable<Weather> {
         return buildRequest(pathComponent: "weather", params: [("q", city)])
             .map({ (json) in
@@ -137,42 +144,65 @@ class ApiController {
             .merge()
             .toArray()
     }
-
-  //MARK: - Private Methods
-
-  /**
-   * Private method to build a request with RxCocoa
-   */
-  private func buildRequest(method: String = "GET", pathComponent: String, params: [(String, String)]) -> Observable<JSON> {
-
-    let url = baseURL.appendingPathComponent(pathComponent)
-    var request = URLRequest(url: url)
-    let keyQueryItem = URLQueryItem(name: "appid", value: apiKey)
-    let unitsQueryItem = URLQueryItem(name: "units", value: "metric")
-    let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: true)!
-
-    if method == "GET" {
-      var queryItems = params.map { URLQueryItem(name: $0.0, value: $0.1) }
-      queryItems.append(keyQueryItem)
-      queryItems.append(unitsQueryItem)
-      urlComponents.queryItems = queryItems
-    } else {
-      urlComponents.queryItems = [keyQueryItem, unitsQueryItem]
-
-      let jsonData = try! JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
-      request.httpBody = jsonData
+    
+    //MARK: - Private Methods
+    
+    /**
+     * Private method to build a request with RxCocoa
+     */
+    private func buildRequest(method: String = "GET", pathComponent: String, params: [(String, String)]) -> Observable<JSON> {
+        
+        let request: Observable<URLRequest> = Observable.create { (observer) -> Disposable in
+            
+            let url = self.baseURL.appendingPathComponent(pathComponent)
+            var request = URLRequest(url: url)
+            let keyQueryItem = URLQueryItem(name: "appid", value: try? self.apiKey.value())
+            let unitsQueryItem = URLQueryItem(name: "units", value: "metric")
+            let urlComponents = NSURLComponents(url: url, resolvingAgainstBaseURL: true)!
+            
+            if method == "GET" {
+                var queryItems = params.map { URLQueryItem(name: $0.0, value: $0.1) }
+                queryItems.append(keyQueryItem)
+                queryItems.append(unitsQueryItem)
+                urlComponents.queryItems = queryItems
+            } else {
+                urlComponents.queryItems = [keyQueryItem, unitsQueryItem]
+                
+                let jsonData = try! JSONSerialization.data(withJSONObject: params, options: .prettyPrinted)
+                request.httpBody = jsonData
+            }
+            
+            request.url = urlComponents.url!
+            request.httpMethod = method
+            
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            
+            observer.onNext(request)
+            observer.onCompleted()
+            
+            return Disposables.create()
+        }
+        
+        
+        
+        let session = URLSession.shared
+        
+        
+        return request.flatMap() { request in
+            return session.rx.response(request: request).map({ (response, data) in
+                if 200 ..< 300 ~= response.statusCode {
+                    return try! JSON(data: data)
+                } else if response.statusCode == 401 {
+                    throw ApiError.invalidKey
+                } else if 400 ..< 500 ~= response.statusCode {
+                    throw ApiError.cityNotFound
+                } else {
+                    throw ApiError.serverFailure
+                }
+            })
+        }
     }
-
-    request.url = urlComponents.url!
-    request.httpMethod = method
-
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-
-    let session = URLSession.shared
-
-    return session.rx.data(request: request).map { try! JSON(data: $0) }
-  }
-
+    
 }
 
 /**
@@ -180,32 +210,32 @@ class ApiController {
  * Source: http://openweathermap.org/weather-conditions
  */
 public func iconNameToChar(icon: String) -> String {
-  switch icon {
-  case "01d":
-    return "\u{f11b}"
-  case "01n":
-    return "\u{f110}"
-  case "02d":
-    return "\u{f112}"
-  case "02n":
-    return "\u{f104}"
-  case "03d", "03n":
-    return "\u{f111}"
-  case "04d", "04n":
-    return "\u{f111}"
-  case "09d", "09n":
-    return "\u{f116}"
-  case "10d", "10n":
-    return "\u{f113}"
-  case "11d", "11n":
-    return "\u{f10d}"
-  case "13d", "13n":
-    return "\u{f119}"
-  case "50d", "50n":
-    return "\u{f10e}"
-  default:
-    return "E"
-  }
+    switch icon {
+    case "01d":
+        return "\u{f11b}"
+    case "01n":
+        return "\u{f110}"
+    case "02d":
+        return "\u{f112}"
+    case "02n":
+        return "\u{f104}"
+    case "03d", "03n":
+        return "\u{f111}"
+    case "04d", "04n":
+        return "\u{f111}"
+    case "09d", "09n":
+        return "\u{f116}"
+    case "10d", "10n":
+        return "\u{f113}"
+    case "11d", "11n":
+        return "\u{f10d}"
+    case "13d", "13n":
+        return "\u{f119}"
+    case "50d", "50n":
+        return "\u{f10e}"
+    default:
+        return "E"
+    }
 }
 
 fileprivate func imageFromText(text: NSString, font: UIFont) -> UIImage {

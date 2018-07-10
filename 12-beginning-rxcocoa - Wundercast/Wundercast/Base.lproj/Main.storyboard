@@ -112,10 +112,19 @@
                                 <rect key="frame" x="169" y="315" width="37" height="37"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </activityIndicatorView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="HqX-97-CiO">
+                                <rect key="frame" x="165.5" y="161" width="44" height="44"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="hlL-p0-01V"/>
+                                    <constraint firstAttribute="width" constant="44" id="pbX-zL-r49"/>
+                                </constraints>
+                                <state key="normal" image="key"/>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="1Bs-Gm-bwQ"/>
+                            <constraint firstItem="HqX-97-CiO" firstAttribute="top" secondItem="x4a-i8-beX" secondAttribute="top" id="1Qt-kj-HdT"/>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" constant="32" id="3EQ-YY-BbS"/>
                             <constraint firstItem="fn5-hY-7os" firstAttribute="width" secondItem="jQQ-9b-2rA" secondAttribute="width" id="6Ay-YA-dE9"/>
                             <constraint firstItem="hts-T4-Yi4" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="Acp-n1-7Cw"/>
@@ -126,6 +135,7 @@
                             <constraint firstItem="CvG-51-WJq" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leadingMargin" id="LfL-fC-hE2"/>
                             <constraint firstItem="CvG-51-WJq" firstAttribute="top" secondItem="y3c-jy-aDJ" secondAttribute="bottom" constant="16" id="LuH-bS-Wr5"/>
                             <constraint firstItem="jQQ-9b-2rA" firstAttribute="top" secondItem="aYm-dp-fOW" secondAttribute="bottom" constant="8" id="MFT-Kh-TpX"/>
+                            <constraint firstItem="HqX-97-CiO" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="O2c-Po-bDQ"/>
                             <constraint firstItem="fn5-hY-7os" firstAttribute="top" secondItem="jQQ-9b-2rA" secondAttribute="bottom" constant="8" id="Rba-DY-MEe"/>
                             <constraint firstAttribute="trailingMargin" secondItem="UPM-Ay-Z6w" secondAttribute="trailing" id="Rp1-7e-Ixy"/>
                             <constraint firstItem="BOa-xV-tXW" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="SY6-gk-HUd"/>
@@ -151,6 +161,7 @@
                         <outlet property="geoLocationButton" destination="hts-T4-Yi4" id="nEq-hA-bWE"/>
                         <outlet property="humidityLabel" destination="aYm-dp-fOW" id="ACB-jg-cWC"/>
                         <outlet property="iconLabel" destination="jQQ-9b-2rA" id="CFl-ge-t02"/>
+                        <outlet property="keyButton" destination="HqX-97-CiO" id="Cau-N1-Tkz"/>
                         <outlet property="mapButton" destination="UPM-Ay-Z6w" id="hNp-MI-UQR"/>
                         <outlet property="mapView" destination="BOa-xV-tXW" id="mBd-uM-1go"/>
                         <outlet property="searchCityName" destination="CvG-51-WJq" id="yXf-Qu-AkM"/>
@@ -164,7 +175,8 @@
         </scene>
     </scenes>
     <resources>
-        <image name="map" width="16" height="16"/>
-        <image name="place-location" width="16" height="16"/>
+        <image name="key" width="32" height="32"/>
+        <image name="map" width="32" height="31"/>
+        <image name="place-location" width="24" height="32"/>
     </resources>
 </document>

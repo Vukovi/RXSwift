@@ -4,6 +4,9 @@ import RxCocoa
 import MapKit
 import CoreLocation
 
+typealias Weather = ApiController.Weather
+public var cachedData = [String: ApiController.Weather]()
+
 class ViewController: UIViewController {
     
     // TRAITS - specijalni RxCocoa-ini observable-i koji su namenjeni boljem radu sa Cocoa-om
@@ -25,6 +28,10 @@ class ViewController: UIViewController {
     @IBOutlet weak var mapButton: UIButton!
     @IBOutlet weak var geoLocationButton: UIButton!
     @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+    
+    @IBOutlet weak var keyButton: UIButton!
+    var keyTextField: UITextField?
+    let maxAttempsts = 4
     
     let bag = DisposeBag()
     
@@ -161,6 +168,22 @@ class ViewController: UIViewController {
         
         //MARK: - Part 5
         // jos jedna kombinacija da bi se dobio multi observable
+        
+        let retryHandler: (Observable<Error>) -> Observable<Int> = { e in
+            return e.flatMapWithIndex({ (error, attempt) -> Observable<Int> in
+                if attempt >= self.maxAttempsts - 1 {
+                    return Observable.error(error)
+                } else if let casted = error as? ApiController.ApiError, casted == .invalidKey {
+                    return ApiController.shared.apiKey.filter({ $0 != "" }).map({ _ in return 1 })
+                    // map({ _ in return 1 }) da bi se usaglasio sa Observable<Int>
+                } else if (error as NSError).code == -1009 {
+                    return RxReachability.shared.status.filter { $0 == .online }.map { _  in return 1 }
+                }
+                print("== retrying after \(attempt + 1) seconds ==")
+                return Observable<Int>.timer(Double(attempt + 1), scheduler: MainScheduler.instance).take(1)
+            })
+        }
+        
         let searchInput = searchCityName.rx
             .controlEvent(UIControlEvents.editingDidEndOnExit)
             .asObservable()
@@ -180,9 +203,31 @@ class ViewController: UIViewController {
             }
             .asDriver(onErrorJustReturn: ApiController.Weather.empty)
         
+        
+        
         let textSearch = searchInput.flatMap { text in
             return ApiController.shared.currentWeather(city: text ?? "Error")
-                .catchErrorJustReturn(ApiController.Weather.dummy)
+//                .do(onNext: { (data) in
+//                    if let text = text {
+//                        cachedData[text] = data
+//                    }
+//                }, onError: { [weak self] e in
+//                    guard let strongSelf = self else { return }
+//                    DispatchQueue.main.async {
+//                        strongSelf.showError(error: e)
+//                    }
+//                })
+//                .catchErrorJustReturn(ApiController.Weather.dummy)  Error Handling Umesto Ovoga
+//                .retry(3) // pokusaj 3 puta pre nego sto budes hendlao error
+                .retryWhen(retryHandler)
+                .cache(key: text ?? "", displayErrorIn: self)
+                .catchError({ (error) -> Observable<ApiController.Weather> in
+                    if let text = text, let cachedData = cachedData[text] {
+                        return Observable.just(cachedData)
+                    } else {
+                        return Observable.just(ApiController.Weather.dummy)
+                    }
+                })
         }
         
         let mapInput = mapView.rx.regionDidChangeAnimated
@@ -270,6 +315,14 @@ class ViewController: UIViewController {
             .disposed(by: bag)
         
         
+        if RxReachability.shared.startMonitor("apple.com") == false {
+            print("Reachability failed!")
+        }
+        
+        keyButton.rx.tap.subscribe(onNext: {
+            self.requestKey()
+        }).disposed(by:bag)
+        
         
         geoLocationButton.rx.tap
             .subscribe(onNext: { _ in
@@ -333,6 +386,27 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    func requestKey() {
+        
+        func configurationTextField(textField: UITextField!) {
+            self.keyTextField = textField
+        }
+        
+        let alert = UIAlertController(title: "Api Key",
+                                      message: "Add the api key:",
+                                      preferredStyle: UIAlertControllerStyle.alert)
+        
+        alert.addTextField(configurationHandler: configurationTextField)
+        
+        alert.addAction(UIAlertAction(title: "Ok", style: UIAlertActionStyle.default, handler:{ (UIAlertAction) in
+            ApiController.shared.apiKey.onNext(self.keyTextField?.text ?? "")
+        }))
+        
+        alert.addAction(UIAlertAction(title: "Cancel", style: UIAlertActionStyle.destructive))
+        
+        self.present(alert, animated: true)
+    }
+    
     // MARK: - Style
     
     private func style() {
@@ -343,6 +417,21 @@ class ViewController: UIViewController {
         iconLabel.textColor = UIColor.cream
         cityNameLabel.textColor = UIColor.cream
     }
+    
+//    func showError(error e: Error) {
+//        if let e = e as? ApiController.ApiError {
+//            switch (e) {
+//            case .cityNotFound:
+//                InfoView.showIn(viewController: self, message: "City Name is invalid")
+//            case .serverFailure:
+//                InfoView.showIn(viewController: self, message: "Server error")
+//            case .invalidKey:
+//                InfoView.showIn(viewController: self, message: "Key is invalid")
+//            }
+//        } else {
+//            InfoView.showIn(viewController: self, message: "An error occurred")
+//        }
+//    }
 }
 
 
@@ -355,3 +444,29 @@ extension ViewController: MKMapViewDelegate {
         return MKOverlayRenderer()
     }
 }
+
+extension ObservableType where E == ApiController.Weather {
+    
+    /// Custom cache operator
+    
+    func cache(key: String, displayErrorIn viewController: UIViewController) -> Observable<E> {
+        return self.observeOn(MainScheduler.instance).do(onNext: { data in
+            cachedData[key] = data
+        }, onError: { e in
+            if let e = e as? ApiController.ApiError {
+                switch (e) {
+                case .cityNotFound:
+                    InfoView.showIn(viewController: viewController, message: "City Name is invalid")
+                case .serverFailure:
+                    InfoView.showIn(viewController: viewController, message: "Server error")
+                case .invalidKey:
+                    InfoView.showIn(viewController: viewController, message: "Key is invalid")
+                }
+            } else {
+                InfoView.showIn(viewController: viewController, message: "An error occurred")
+            }
+        })
+    }
+    
+}
+

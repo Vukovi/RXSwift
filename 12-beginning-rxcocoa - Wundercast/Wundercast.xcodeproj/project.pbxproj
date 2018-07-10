@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		BFD2111420F39F51002BC77A /* CLLocationManager+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD2111220F39F50002BC77A /* CLLocationManager+Rx.swift */; };
 		BFD2111520F39F51002BC77A /* MKMapView+Rx.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFD2111320F39F50002BC77A /* MKMapView+Rx.swift */; };
+		BFE068CD20F4CAE700D3157D /* RxReachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE068CC20F4CAE700D3157D /* RxReachability.swift */; };
+		BFE068D520F4CB2400D3157D /* InfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFE068D120F4CB2400D3157D /* InfoView.swift */; };
+		BFE068D620F4CB2400D3157D /* InfoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = BFE068D220F4CB2400D3157D /* InfoView.xib */; };
 		CA64900EFE1D9F43973A260F /* Pods_Wundercast.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4098AFCCA291187AB4A1327B /* Pods_Wundercast.framework */; };
 		CB4D69411DE9A7D100DC0488 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4D69401DE9A7D100DC0488 /* AppDelegate.swift */; };
 		CB4D69431DE9A7D100DC0488 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB4D69421DE9A7D100DC0488 /* ViewController.swift */; };
@@ -40,6 +43,9 @@
 		A8FEC475BD4840CDBFA8E9B0 /* Pods-Wundercast.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Wundercast.release.xcconfig"; path = "Pods/Target Support Files/Pods-Wundercast/Pods-Wundercast.release.xcconfig"; sourceTree = "<group>"; };
 		BFD2111220F39F50002BC77A /* CLLocationManager+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CLLocationManager+Rx.swift"; sourceTree = "<group>"; };
 		BFD2111320F39F50002BC77A /* MKMapView+Rx.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "MKMapView+Rx.swift"; sourceTree = "<group>"; };
+		BFE068CC20F4CAE700D3157D /* RxReachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RxReachability.swift; sourceTree = "<group>"; };
+		BFE068D120F4CB2400D3157D /* InfoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InfoView.swift; sourceTree = "<group>"; };
+		BFE068D220F4CB2400D3157D /* InfoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = InfoView.xib; sourceTree = "<group>"; };
 		CB4D693D1DE9A7D100DC0488 /* Wundercast.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Wundercast.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB4D69401DE9A7D100DC0488 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CB4D69421DE9A7D100DC0488 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -99,8 +105,18 @@
 			children = (
 				BFD2111220F39F50002BC77A /* CLLocationManager+Rx.swift */,
 				BFD2111320F39F50002BC77A /* MKMapView+Rx.swift */,
+				BFE068CC20F4CAE700D3157D /* RxReachability.swift */,
 			);
 			path = Extensions;
+			sourceTree = "<group>";
+		};
+		BFE068CE20F4CB2400D3157D /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				BFE068D120F4CB2400D3157D /* InfoView.swift */,
+				BFE068D220F4CB2400D3157D /* InfoView.xib */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 		CB4D69341DE9A7D100DC0488 = {
@@ -161,6 +177,7 @@
 		CB4D69641DE9AD2A00DC0488 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				BFE068CE20F4CB2400D3157D /* Utils */,
 				CB4D696E1DE9C70100DC0488 /* Appearance.swift */,
 				CB4D696F1DE9C70100DC0488 /* Colors.swift */,
 			);
@@ -267,6 +284,7 @@
 				CB4D696B1DE9AD7C00DC0488 /* LICENSE in Resources */,
 				CB4D694B1DE9A7D100DC0488 /* LaunchScreen.storyboard in Resources */,
 				CB4D69481DE9A7D100DC0488 /* Assets.xcassets in Resources */,
+				BFE068D620F4CB2400D3157D /* InfoView.xib in Resources */,
 				CB4D69611DE9A7F100DC0488 /* Podfile in Resources */,
 				CB4D69461DE9A7D100DC0488 /* Main.storyboard in Resources */,
 				CB4D69691DE9AD6200DC0488 /* weather.ttf in Resources */,
@@ -346,7 +364,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				CB4D69431DE9A7D100DC0488 /* ViewController.swift in Sources */,
+				BFE068D520F4CB2400D3157D /* InfoView.swift in Sources */,
 				CB4D69711DE9C70100DC0488 /* Colors.swift in Sources */,
+				BFE068CD20F4CAE700D3157D /* RxReachability.swift in Sources */,
 				CB4D69411DE9A7D100DC0488 /* AppDelegate.swift in Sources */,
 				BFD2111520F39F51002BC77A /* MKMapView+Rx.swift in Sources */,
 				BFD2111420F39F51002BC77A /* CLLocationManager+Rx.swift in Sources */,
