@@ -370,10 +370,13 @@ class RxSwift: UIViewController {
         let imageData = UIImagePNGRepresentation(image)!
         
         let imageSubject = PublishSubject<Data>()
-        let scheduler = ConcurrentDispatchQueueScheduler(qos: .background)
+        let schedulerConcurrent = ConcurrentDispatchQueueScheduler(qos: .background) // paraleleni red
+        
+        let concurrentQueue = DispatchQueue(label: "paralelni.red.a.ipak.ce.biti.serijski.scheduler", attributes: .concurrent)
+        let schedulerSerial = SerialDispatchQueueScheduler(queue: concurrentQueue, internalSerialQueueName: "bez.obzira.sto.sam.napravio.paralelni.red.ovo.ce.biti.serijiski.scheduler")
         
         let imageDisposable = imageSubject
-            .observeOn(scheduler)
+            .observeOn(schedulerConcurrent)
             .map { (data) -> UIImage in
                 UIImage(data: data)!
             }
@@ -389,6 +392,7 @@ class RxSwift: UIViewController {
         
     }
 }
+
 
 
 
